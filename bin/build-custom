@@ -1,0 +1,37 @@
+<?php
+
+
+$langs = [
+    'en_US',
+    'fr_FR',
+    'de_DE',
+    'es_ES',
+    'it_IT',
+    'pt_PT',
+];
+
+
+$countries = [];
+foreach ($langs as $lang) {
+    $countries[$lang] = include __DIR__ . "/../data/$lang/country.php";
+}
+
+$out = fopen(__DIR__ . '/../countries.csv', 'w');
+$header = ['Code'];
+foreach ($langs as $lang) {
+    $header[] = localeTransform($lang);
+}
+fputcsv($out, $header);
+foreach ($countries['en_US'] as $code => $name) {
+    $row = [$code, $name];
+    foreach ($langs as $lang) {
+        $row[] = $countries[$lang][$code];
+    }
+    fputcsv($out, $row);
+}
+
+function localeTransform($locale)
+{
+    $locale = str_replace('_', '-', $locale);
+    return strtolower($locale);
+}
